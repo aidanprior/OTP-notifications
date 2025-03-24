@@ -6,15 +6,16 @@ This tool monitors a specified Email folder for new emails containing OTP codes,
 
 ## Requirements
 
-- macOS
-- HomeBrew
+- macOS or Linux
+- On macOS: HomeBrew
+- On Linux: A package manager (apt, dnf, pacman, or zypper)
 
 ## Installation
 
 Run the following command to download and run the install wizard:
 
-```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/aidanprior/email-otp-extractor/main/install-autostart.sh)"
+```sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/aidanprior/email-otp-extractor/main/install-autostart.sh)"
 ```
 
 The installer will:
@@ -23,7 +24,7 @@ The installer will:
 - Add Go binaries to your PATH if needed
 - Prompt you for your email configuration details
 - Create the configuration file with your settings
-- Set up a LaunchAgent for running the service at login
+- Set up a background service for running the service at login
 - Offer to start the service immediately
 
 During setup, you'll be asked for:
