@@ -130,7 +130,7 @@ mkdir -p "$CONFIG_DIR"
 
 # Download the OTP extraction script
 echo "Downloading OTP extraction script..."
-curl -s -o "$OTP_SCRIPT_PATH" "https://raw.githubusercontent.com/aidanprior/email-otp-extractor/main/extract-otp.sh"
+curl -s -o "$OTP_SCRIPT_PATH" "https://raw.githubusercontent.com/aidanprior/OTP-notifications/main/extract-otp.sh"
 
 # Make the script executable
 chmod +x "$OTP_SCRIPT_PATH"
