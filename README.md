@@ -15,7 +15,7 @@ This tool monitors a specified Email folder for new emails containing OTP codes,
 Run the following command to download and run the install wizard:
 
 ```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/aidanprior/email-otp-extractor/main/install-autostart.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/aidanprior/OTP-notifications/main/install-autostart.sh)"
 ```
 
 The installer will:
