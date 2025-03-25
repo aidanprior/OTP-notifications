@@ -1,178 +1,118 @@
-# Email OTP Extractor
+# Email OTP Checker
 
-Text and Email OTPs are not as secure as other Muli-Factor Authentication methods, yet they are very common. They often are the most annoying to use as well, requiring you to pick up your phone or check your inbox.
+A simple shell script that checks your email for OTP codes and copies them to the clipboard.
 
-This tool monitors a specified Email folder for new emails containing OTP codes, extracts the codes, and copies them to your clipboard automatically. It uses IMAP IDLE for efficient monitoring without constant polling.
+## Features
+
+- Lightweight shell script with minimal dependencies
+- Automatically extracts numeric OTP codes (4-8 digits)
+- Copies the code to your clipboard
+- Shows desktop notifications
+- Remembers which emails it has already checked
+- Works on macOS and Linux systems
+- Runs via cron for scheduled checking
+- Secure password storage using OpenSSL encryption
 
 ## Requirements
 
-- macOS or Linux
-- On macOS: HomeBrew
-- On Linux: A package manager (apt, dnf, pacman, or zypper)
+- OpenSSL for secure IMAP communication and password encryption
+- Cron for scheduled execution
+- Clipboard utility (pbcopy, xclip, or xsel)
+- Email account with IMAP support
+- For macOS: Homebrew (recommended for automatic dependency installation)
 
-## Installation
+## Quick Install
 
-Run the following command to download and run the install wizard:
+You can install the Email OTP Checker with a single command:
 
-```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/aidanprior/OTP-notifications/main/install-autostart.sh)"
+```bash
+curl -sSL https://raw.githubusercontent.com/aidanprior/email-otp-checker/main/install.sh | sh
 ```
 
 The installer will:
 
-- Check for and install required dependencies (Go and goimapnotify)
-- Add Go binaries to your PATH if needed
-- Prompt you for your email configuration details
-- Create the configuration file with your settings
-- Set up a background service for running the service at login
-- Offer to start the service immediately
+1. Check for and install OpenSSL if necessary
+2. Check for and enable cron if necessary
+3. Ask for your email credentials
+4. Encrypt your password with OpenSSL
+5. Set up scheduled execution with cron
+6. Create all necessary directories with appropriate permissions
 
-During setup, you'll be asked for:
+## Manual Usage
 
-- IMAP server address (defaults to imap.gmail.com)
-- IMAP port (defaults to 993)
-- Your email address
-- Your password or app password (recommended)
-- Which mailbox to monitor (defaults to INBOX)
-
-## App Passwords
-
-For security reasons, many email providers no longer support using your regular account password for third-party apps. Instead, you should create an "app password" - a special password that gives limited access to your email account.
-
-### What is an App Password?
-
-- A unique 16-character password that allows a less secure app or device to access your email account
-- Limited to specific purposes and can be revoked without changing your main password
-- More secure than using your primary account password
-
-### How to Generate App Passwords
-
-**For Gmail:**
-
-1. Go to your [Google Account](https://myaccount.google.com/)
-2. Select "Security"
-3. Under "Signing in to Google," select "App passwords" (requires 2-Step Verification to be enabled)
-4. Select "Mail" as the app and your device type
-5. Click "Generate"
-
-**For Yahoo Mail:**
-
-1. Go to your [Account security settings](https://login.yahoo.com/account/security)
-2. Click "Generate app password"
-3. Select "Other app" and name it "Email OTP Extractor"
-4. Click "Generate"
-
-**For Outlook/Hotmail:**
-
-1. Sign in to your [Microsoft account](https://account.microsoft.com/)
-2. Go to "Security" > "Advanced security options"
-3. Under "App passwords," select "Create a new app password"
-
-### Other Email Providers
-
-- Most IMAP-compatible email providers support app passwords
-- Check your email provider's security or account settings
-
-## Setting Up Email Filters (Optional)
-
-For better organization, you can create filters in your email service to automatically move OTP messages to a dedicated folder that the OTP extractor will monitor.
-
-### Why Create a Filter?
-
-- Keeps your inbox cleaner
-- Improves reliability of OTP detection
-- Allows you to use a dedicated mailbox instead of scanning all incoming mail (which will mean this script won't run on every new email)
-
-### Gmail Filters
-
-1. Go to Gmail settings (gear icon) > "See all settings"
-2. Select the "Filters and Blocked Addresses" tab
-3. Click "Create a new filter"
-4. Set up your search criteria (examples below)
-5. Click "Create filter"
-6. Select "Apply the label" and choose or create an "OTP" label
-7. Optionally check "Skip the Inbox" to move messages out of the inbox
-8. Click "Create filter"
-
-Search criteria examples:
-
-- Subject: `verification code OR security code OR one-time OR OTP OR passcode`
-- From: Add common services that send you OTPs
-- Has the words: `verification code OR security code OR one-time password OR OTP`
-
-### Outlook/Hotmail Filters
-
-1. Go to Settings (gear icon) > "View all Outlook settings"
-2. Go to "Mail" > "Rules"
-3. Click "Add new rule"
-4. Name your rule (e.g., "OTP Messages")
-5. Add conditions (examples below)
-6. Add actions: "Move to" > select or create an "OTP" folder
-7. Save the rule
-
-Condition examples:
-
-- Subject includes: `code, verification, security, one-time, passcode, OTP`
-- Body includes: `verification code, security code, one-time password`
-
-### Yahoo Mail Filters
-
-1. Go to Settings (gear icon) > "More Settings"
-2. Select "Filters" > "Add new filters"
-3. Name your filter (e.g., "OTP Messages")
-4. Set conditions (examples below)
-5. Choose "Move to folder" and select or create an "OTP" folder
-6. Click "Save"
-
-Condition examples:
-
-- Subject contains: `code, verification, security, passcode, OTP`
-- Sender contains: Add services that send you OTPs
-- Body contains: `verification code, one-time password, security code`
-
-### After Creating Filters
-
-Remember to update your OTP extractor configuration to monitor the specific folder where your OTP messages will be filtered:
+If you need to run the script manually or want to understand the command-line arguments:
 
 ```bash
-nano ~/.config/goimapnotify.json
+./otp_check.sh [USERNAME] [SERVER] [MAILBOX]
 ```
 
-Change the "boxes" setting to match your OTP folder name.
+### Arguments
 
-## Usage
+1. `USERNAME` - Your email address (required)
+2. `SERVER` - IMAP server address (default: imap.gmail.com)
+3. `MAILBOX` - The mailbox to check (default: INBOX)
 
-The service runs in the background once started. No further action is needed.
+### Examples
 
-To run manually (for testing):
+Checking a Gmail account:
 
-```sh
-goimapnotify -conf ~/.config/goimapnotify.json
+```bash
+./otp_check.sh "your.email@gmail.com" "imap.gmail.com" "INBOX"
 ```
 
-To disable autostart:
+Checking a Yahoo account:
 
-```sh
-launchctl unload ~/Library/LaunchAgents/com.user.imap-otp.plist
+```bash
+./otp_check.sh "your.email@yahoo.com" "imap.mail.yahoo.com" "INBOX"
+```
+
+Checking a specific folder for Outlook:
+
+```bash
+./otp_check.sh "your.email@outlook.com" "outlook.office365.com" "OTP"
+```
+
+### Debug Mode
+
+You can enable debug mode to see more information about what the script is doing:
+
+```bash
+DEBUG=true ./otp_check.sh "your.email@example.com" "imap.gmail.com" "INBOX"
 ```
 
 ## How It Works
 
-The script uses goimapnotify to monitor your email folder using IMAP IDLE protocol. When a new email arrives:
+1. The script connects to your email server using the IMAP protocol via OpenSSL
+2. It looks for new emails that arrived since the last check
+3. For each new email, it extracts 4-8 digit numbers which are likely to be OTP codes
+4. When an OTP code is found, it is copied to your clipboard and a notification is shown
+5. The script remembers which emails it has already checked to avoid duplicates
 
-1. The script extracts the OTP code (4-8 digits)
-2. Copies it to your clipboard
-3. Displays a notification with sender info and the code
+## Security
+
+Your email password is stored with the following precautions:
+
+- Encrypted using OpenSSL AES-256-CBC encryption
+- Stored in a directory with restricted permissions (700)
+- The password file itself has restricted permissions (600)
+
+## File Locations
+
+The script follows XDG Base Directory Specification:
+
+- **Cache**: `~/.cache/email-otp-monitor/` - Stores the last processed email UID
+- **Secrets**: `~/.local/share/email-otp-monitor/` - Stores your encrypted password
+- **Logs**: `~/.local/state/email-otp-monitor.log` - Activity logs
 
 ## Troubleshooting
 
-Logs are written to:
+If the script doesn't work as expected:
 
-- `~/.logs/imap-otp.log`
-- `~/.logs/imap-otp.error.log`
+1. Run it in debug mode to see detailed logs: `DEBUG=true ./otp_check.sh ...`
+2. Check the log file at `~/.local/state/email-otp-monitor.log`
+3. Ensure your email provider allows IMAP access
+4. For Gmail, you may need to create an App Password instead of using your regular password
 
-If you need to check the status of the service, run:
+## Contributing
 
-```sh
-launchctl list | grep com.user.imap-otp
-```
+Contributions are welcome! Please feel free to submit a Pull Request.
